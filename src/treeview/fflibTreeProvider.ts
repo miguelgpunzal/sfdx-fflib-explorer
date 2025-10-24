@@ -257,12 +257,9 @@ export class FFLibTreeDataProvider implements vscode.TreeDataProvider<FFLibTreeI
                 missingItem.tooltip = `Class ${cls.name} is registered in the Application but does not exist in the workspace.`;
                 items.push(missingItem);
             } else {
-                // For services, domains, and selectors, make them expandable to show interface and impl
-                const collapsibleState = (
-                    layer === FFLibLayerType.SERVICE ||
-                    layer === FFLibLayerType.DOMAIN ||
-                    layer === FFLibLayerType.SELECTOR
-                ) 
+                // Only Services need to be expandable (they have Interface + Base + Impl)
+                // Domains and Selectors are single files, so they should not be expandable
+                const collapsibleState = (layer === FFLibLayerType.SERVICE) 
                     ? vscode.TreeItemCollapsibleState.Collapsed 
                     : vscode.TreeItemCollapsibleState.None;
                 

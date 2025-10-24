@@ -149,6 +149,48 @@ export class FFLibCommandHandler {
         });
     }
 
+    /**
+     * Fetch SObjects from the org using SF CLI
+     */
+    private async fetchSObjectsFromOrg(): Promise<string[]> {
+        const { exec } = require('child_process');
+        const { promisify } = require('util');
+        const execPromise = promisify(exec);
+        
+        const terminal = vscode.window.createTerminal('FFLIB SObject Query');
+        
+        try {
+            const { stdout } = await execPromise('sf sobject list --sobject all --json');
+            const result = JSON.parse(stdout);
+            
+            let allSObjects: string[] = [];
+            
+            if (result.status === 0 && result.result) {
+                allSObjects = result.result.map((obj: any) => obj.name || obj).sort();
+            }
+            
+            // If SF CLI fails, try SFDX
+            if (allSObjects.length === 0) {
+                try {
+                    const { stdout: sfdxStdout } = await execPromise('sfdx force:schema:sobject:list --json');
+                    const sfdxResult = JSON.parse(sfdxStdout);
+                    if (sfdxResult.status === 0 && sfdxResult.result) {
+                        allSObjects = sfdxResult.result.sort();
+                    }
+                } catch (sfdxError) {
+                    // Ignore SFDX error if already failed
+                }
+            }
+            
+            terminal.dispose();
+            
+            return allSObjects;
+        } catch (error) {
+            terminal.dispose();
+            throw error;
+        }
+    }
+
     async createDomain(item?: any) {
         const applicationName = item?.application?.name?.replace('Application', '') || '';
         
@@ -173,15 +215,32 @@ export class FFLibCommandHandler {
             return;
         }
 
-        // Ask for SObject name
-        const sObjectName = await vscode.window.showInputBox({
-            prompt: 'Enter the SObject API name (e.g., Account, Contact, Custom__c)',
-            placeHolder: 'Account',
-            validateInput: (value) => {
-                if (!value) {
-                    return 'SObject name is required';
+        // Fetch SObjects from org with progress
+        let sObjectName: string | undefined;
+        
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Fetching SObjects",
+            cancellable: false
+        }, async (progress) => {
+            progress.report({ message: "Querying org for SObjects..." });
+            
+            try {
+                const allSObjects = await this.fetchSObjectsFromOrg();
+                
+                if (allSObjects.length === 0) {
+                    vscode.window.showErrorMessage('Could not fetch SObjects from org. Make sure you are authenticated.');
+                    return;
                 }
-                return null;
+                
+                // Show single-select quick pick
+                sObjectName = await vscode.window.showQuickPick(allSObjects, {
+                    placeHolder: 'Select the SObject for this Domain',
+                    title: 'Select SObject',
+                    matchOnDescription: true
+                });
+            } catch (error) {
+                vscode.window.showErrorMessage('Could not fetch SObjects from org. Make sure you are authenticated.');
             }
         });
 
@@ -224,15 +283,32 @@ export class FFLibCommandHandler {
             return;
         }
 
-        // Ask for SObject name
-        const sObjectName = await vscode.window.showInputBox({
-            prompt: 'Enter the SObject API name (e.g., Account, Contact, Custom__c)',
-            placeHolder: 'Account',
-            validateInput: (value) => {
-                if (!value) {
-                    return 'SObject name is required';
+        // Fetch SObjects from org with progress
+        let sObjectName: string | undefined;
+        
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Fetching SObjects",
+            cancellable: false
+        }, async (progress) => {
+            progress.report({ message: "Querying org for SObjects..." });
+            
+            try {
+                const allSObjects = await this.fetchSObjectsFromOrg();
+                
+                if (allSObjects.length === 0) {
+                    vscode.window.showErrorMessage('Could not fetch SObjects from org. Make sure you are authenticated.');
+                    return;
                 }
-                return null;
+                
+                // Show single-select quick pick
+                sObjectName = await vscode.window.showQuickPick(allSObjects, {
+                    placeHolder: 'Select the SObject for this Selector',
+                    title: 'Select SObject',
+                    matchOnDescription: true
+                });
+            } catch (error) {
+                vscode.window.showErrorMessage('Could not fetch SObjects from org. Make sure you are authenticated.');
             }
         });
 

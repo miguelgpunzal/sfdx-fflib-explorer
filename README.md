@@ -10,6 +10,12 @@
 [![Downloads](https://img.shields.io/visual-studio-marketplace/d/MiguelPunzal.salesforce-fflib-explorer)](https://marketplace.visualstudio.com/items?itemName=MiguelPunzal.salesforce-fflib-explorer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+### 🎥 Watch the Demo
+
+[![FFLIB Explorer Demo](https://img.youtube.com/vi/tbLOX0-8RoA/maxresdefault.jpg)](https://youtu.be/tbLOX0-8RoA)
+
+**[▶️ Watch Full Demo on YouTube](https://youtu.be/tbLOX0-8RoA)**
+
 [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](docs/USAGE.md)
 
 </div>

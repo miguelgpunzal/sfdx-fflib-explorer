@@ -2,6 +2,24 @@
 
 All notable changes to the "Salesforce FFLIB Explorer" extension will be documented in this file.
 
+## [1.0.10] - 2024-10-24
+### Added
+- SObject picker for Domain creation - Now uses org SObject list instead of manual input
+- SObject picker for Selector creation - Now uses org SObject list instead of manual input
+- Queries org using SF CLI (`sf sobject list`) with SFDX fallback
+- Progress indicator while fetching SObjects from org
+
+### Changed
+- Domain creation now shows searchable SObject picker
+- Selector creation now shows searchable SObject picker
+- Consistent UX with Unit of Work SObject selection
+
+## [1.0.9] - 2024-10-24
+### Fixed
+- Removed expand/collapse icons from Domain and Selector items in tree view
+- Only Services show expand/collapse icons (since they have Interface + Base + Impl files)
+- Domains and Selectors now display as single items without expansion (single file each)
+
 ## [1.0.8] - 2024-10-24
 ### Changed
 - **CORRECTED FFLIB Structure**: Now follows proper FFLIB pattern
