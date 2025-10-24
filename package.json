@@ -1,0 +1,126 @@
+{
+  "name": "salesforce-fflib-explorer",
+  "displayName": "Salesforce FFLIB Explorer",
+  "description": "Visual interface for managing FFLIB architecture in Salesforce projects",
+  "version": "1.0.0",
+  "publisher": "MiguelPunzal",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miguelpunzal/sfdx-fflib-ui-configurator"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/sfdx-project.json"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "fflib-explorer",
+          "title": "FFLIB Explorer",
+          "icon": "$(layers)"
+        }
+      ]
+    },
+    "views": {
+      "fflib-explorer": [
+        {
+          "id": "fflibTreeView",
+          "name": "Architecture Layers"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "fflib.refresh",
+        "title": "Refresh FFLIB Explorer",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "fflib.createApplication",
+        "title": "Create New Application",
+        "icon": "$(add)"
+      },
+      {
+        "command": "fflib.createService",
+        "title": "Create New Service",
+        "icon": "$(add)"
+      },
+      {
+        "command": "fflib.createDomain",
+        "title": "Create New Domain",
+        "icon": "$(add)"
+      },
+      {
+        "command": "fflib.createSelector",
+        "title": "Create New Selector",
+        "icon": "$(add)"
+      },
+      {
+        "command": "fflib.createUnitOfWork",
+        "title": "Create New Unit of Work",
+        "icon": "$(add)"
+      },
+      {
+        "command": "fflib.openFile",
+        "title": "Open File"
+      },
+      {
+        "command": "fflib.revealDependencies",
+        "title": "Show Dependencies"
+      },
+      {
+        "command": "fflib.retrieveClass",
+        "title": "Retrieve Class from Org",
+        "icon": "$(cloud-download)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "fflib.refresh",
+          "when": "view == fflibTreeView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "fflib.retrieveClass",
+          "when": "view == fflibTreeView && viewItem =~ /-missing$/",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "eslint": "^8.47.0",
+    "glob": "^10.3.3",
+    "mocha": "^10.2.0",
+    "typescript": "^5.1.6",
+    "@vscode/test-electron": "^2.3.4"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2"
+  }
+}
