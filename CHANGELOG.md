@@ -2,6 +2,10 @@
 
 All notable changes to the "Salesforce FFLIB Explorer" extension will be documented in this file.
 
+## [1.0.11] - 2024-10-24
+### Added
+- YouTube demo video link in README for easy access to extension tutorial
+
 ## [1.0.10] - 2024-10-24
 ### Added
 - SObject picker for Domain creation - Now uses org SObject list instead of manual input
