@@ -2,6 +2,12 @@
 
 All notable changes to the "Salesforce FFLIB Explorer" extension will be documented in this file.
 
+## [1.0.12] - 2024-10-25
+### Fixed
+- Removed expand/collapse arrow from Domain and Selector items completely
+- Cleaned up unused getDomainChildren and getSelectorChildren methods
+- Ensured Domains and Selectors display as non-expandable single file items
+
 ## [1.0.11] - 2024-10-24
 ### Added
 - YouTube demo video link in README for easy access to extension tutorial

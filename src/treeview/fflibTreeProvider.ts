@@ -49,15 +49,8 @@ export class FFLibTreeDataProvider implements vscode.TreeDataProvider<FFLibTreeI
             return this.getServiceChildren(element);
         }
 
-        // Domain item - show interface and implementation
-        if (element.itemContextValue === 'domain') {
-            return this.getDomainChildren(element);
-        }
-
-        // Selector item - show interface and implementation
-        if (element.itemContextValue === 'selector') {
-            return this.getSelectorChildren(element);
-        }
+        // Domains and Selectors are single files - no children
+        // Removed getDomainChildren and getSelectorChildren handlers
 
         return [];
     }
@@ -339,81 +332,6 @@ export class FFLibTreeDataProvider implements vscode.TreeDataProvider<FFLibTreeI
         return items;
     }
 
-    private async getDomainChildren(element: FFLibTreeItem): Promise<FFLibTreeItem[]> {
-        const domainCls = element.data;
-        const items: FFLibTreeItem[] = [];
-
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            return items;
-        }
-
-        const domainName = domainCls.name;
-        let interfaceName = '';
-
-        // Check if this is Domains (plural) or Domain (singular)
-        if (domainName.endsWith('Domains')) {
-            interfaceName = 'I' + domainName;
-        } else if (domainName.endsWith('Domain')) {
-            interfaceName = 'I' + domainName;
-        }
-
-        // Search for interface file
-        if (interfaceName) {
-            const interfaceFiles = await vscode.workspace.findFiles(`**/${interfaceName}.cls`, '**/node_modules/**');
-            if (interfaceFiles.length > 0) {
-                const interfaceItem = new FFLibTreeItem(
-                    `${interfaceName} (interface)`,
-                    vscode.TreeItemCollapsibleState.None,
-                    'domainInterface',
-                    interfaceFiles[0],
-                    { name: interfaceName, filePath: interfaceFiles[0].fsPath }
-                );
-                items.push(interfaceItem);
-            }
-        }
-
-        return items;
-    }
-
-    private async getSelectorChildren(element: FFLibTreeItem): Promise<FFLibTreeItem[]> {
-        const selectorCls = element.data;
-        const items: FFLibTreeItem[] = [];
-
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
-            return items;
-        }
-
-        const selectorName = selectorCls.name;
-        let interfaceName = '';
-
-        // Check various naming patterns
-        if (selectorName.endsWith('Selectors')) {
-            interfaceName = 'I' + selectorName;
-        } else if (selectorName.endsWith('Selector')) {
-            interfaceName = 'I' + selectorName;
-        } else if (selectorName.startsWith('Selectors')) {
-            interfaceName = 'I' + selectorName;
-        } else if (selectorName.startsWith('Selector')) {
-            interfaceName = 'I' + selectorName;
-        }
-
-        // Search for interface file
-        if (interfaceName) {
-            const interfaceFiles = await vscode.workspace.findFiles(`**/${interfaceName}.cls`, '**/node_modules/**');
-            if (interfaceFiles.length > 0) {
-                const interfaceItem = new FFLibTreeItem(
-                    `${interfaceName} (interface)`,
-                    vscode.TreeItemCollapsibleState.None,
-                    'selectorInterface',
-                    interfaceFiles[0],
-                    { name: interfaceName, filePath: interfaceFiles[0].fsPath }
-                );
-                items.push(interfaceItem);
-            }
-        }
-
-        return items;
-    }
+    // Removed getDomainChildren and getSelectorChildren methods
+    // Domains and Selectors are now single files with no child items
 }
