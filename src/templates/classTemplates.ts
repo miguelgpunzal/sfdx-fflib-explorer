@@ -639,3 +639,205 @@ public class ${className} extends fflib_SObjectUnitOfWork {
     // }
 }`;
 }
+
+/**
+ * Template for Domain interface
+ */
+export function generateDomainInterfaceTemplate(interfaceName: string, sObjectName: string): string {
+    return `/**
+ * ${interfaceName} - Domain interface for ${sObjectName}
+ * 
+ * Domain layer encapsulates single-object business logic and validation.
+ * 
+ * Responsibilities:
+ * - Single SObject business logic
+ * - Validation rules
+ * - Field defaulting
+ * - Record-level calculations
+ * - No cross-object operations (use Services for that)
+ * - No SOQL queries (use Selectors)
+ */
+public interface ${interfaceName} {
+    /**
+     * Get the records in this domain
+     * 
+     * @return List of ${sObjectName} records
+     */
+    List<${sObjectName}> getRecords();
+    
+    /**
+     * Define additional domain methods here
+     * Example: void validateBusinessRules();
+     * Example: void applyDiscounts();
+     */
+}`;
+}
+
+/**
+ * Template for Domain base class
+ */
+export function generateDomainBaseTemplate(interfaceName: string, baseClassName: string, sObjectName: string, applicationClassName?: string): string {
+    // Use the provided application class name or fallback to 'Application'
+    const appClass = applicationClassName || 'Application';
+    
+    return `/**
+ * ${baseClassName} - Domain base class for ${sObjectName}
+ * 
+ * Abstract base implementation of ${interfaceName}.
+ * Can contain common domain logic.
+ */
+public abstract class ${baseClassName} extends fflib_SObjectDomain implements ${interfaceName} {
+    
+    /**
+     * @description Domain factory method to get domain implementation
+     * @param records List of ${sObjectName} records
+     * @return ${interfaceName} implementation
+     */
+    public static ${interfaceName} newInstance(List<${sObjectName}> records) {
+        return (${interfaceName}) ${appClass}.Domain.newInstance(records);
+    }
+    
+    /**
+     * @description Domain factory method to get domain implementation
+     * @param records List of SObject records
+     * @return ${interfaceName} implementation
+     */
+    public static ${interfaceName} newInstance(List<SObject> records) {
+        return (${interfaceName}) ${appClass}.Domain.newInstance(records);
+    }
+    
+    /**
+     * @description Domain factory method to get domain implementation
+     * @param recordIds Set of record Ids
+     * @return ${interfaceName} implementation
+     */
+    public static ${interfaceName} newInstance(Set<Id> recordIds) {
+        return (${interfaceName}) ${appClass}.Domain.newInstance(recordIds);
+    }
+    
+    /**
+     * Constructor
+     */
+    public ${baseClassName}(List<${sObjectName}> records) {
+        super(records);
+    }
+    
+    /**
+     * Get the records as ${sObjectName} list
+     */
+    public List<${sObjectName}> getRecords() {
+        return (List<${sObjectName}>) Records;
+    }
+    
+    /**
+     * Trigger handler - before insert
+     */
+    public override void onBeforeInsert() {
+        // Implement before insert logic
+    }
+    
+    /**
+     * Trigger handler - before update
+     */
+    public override void onBeforeUpdate(Map<Id, SObject> existingRecords) {
+        // Implement before update logic
+    }
+    
+    /**
+     * Trigger handler - after insert
+     */
+    public override void onAfterInsert() {
+        // Implement after insert logic
+    }
+    
+    /**
+     * Trigger handler - after update
+     */
+    public override void onAfterUpdate(Map<Id, SObject> existingRecords) {
+        // Implement after update logic
+    }
+}`;
+}
+
+/**
+ * Template for Domain implementation class
+ */
+export function generateDomainImplTemplate(interfaceName: string, implClassName: string, sObjectName: string): string {
+    return `/**
+ * ${implClassName} - Domain implementation for ${sObjectName}
+ */
+public class ${implClassName} extends fflib_SObjectDomain implements ${interfaceName} {
+    
+    /**
+     * Constructor
+     */
+    public ${implClassName}(List<${sObjectName}> records) {
+        super(records);
+    }
+    
+    /**
+     * Factory class for creating instances
+     */
+    public class Constructor implements fflib_SObjectDomain.IConstructable {
+        public fflib_SObjectDomain construct(List<SObject> sObjectList) {
+            return new ${implClassName}(sObjectList);
+        }
+    }
+    
+    /**
+     * Get the records as ${sObjectName} list
+     */
+    public List<${sObjectName}> getRecords() {
+        return (List<${sObjectName}>) Records;
+    }
+    
+    /**
+     * Trigger handler - before insert
+     */
+    public override void onBeforeInsert() {
+        // Implement before insert logic
+        // Example: setDefaults();
+    }
+    
+    /**
+     * Trigger handler - before update
+     */
+    public override void onBeforeUpdate(Map<Id, SObject> existingRecords) {
+        // Implement before update logic
+        // Example: validateChanges((Map<Id, ${sObjectName}>) existingRecords);
+    }
+    
+    /**
+     * Trigger handler - after insert
+     */
+    public override void onAfterInsert() {
+        // Implement after insert logic
+    }
+    
+    /**
+     * Trigger handler - after update
+     */
+    public override void onAfterUpdate(Map<Id, SObject> existingRecords) {
+        // Implement after update logic
+    }
+    
+    /**
+     * Example: Set default values on records
+     */
+    // private void setDefaults() {
+    //     for (${sObjectName} record : getRecords()) {
+    //         // Set defaults
+    //     }
+    // }
+    
+    /**
+     * Example: Validate changes
+     */
+    // private void validateChanges(Map<Id, ${sObjectName}> existingRecords) {
+    //     for (${sObjectName} record : getRecords()) {
+    //         ${sObjectName} oldRecord = existingRecords.get(record.Id);
+    //         // Validate changes
+    //     }
+    // }
+}`;
+}

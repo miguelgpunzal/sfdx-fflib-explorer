@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { FFLibFileScanner } from '../utils/fileScanner';
 import { FFLibTreeDataProvider } from '../treeview/fflibTreeProvider';
 import { FFLibTreeItem } from '../treeview/treeItem';
-import { generateApplicationTemplate, generateServiceInterfaceTemplate, generateServiceBaseTemplate, generateServiceImplTemplate, generateDomainTemplate, generateSelectorInterfaceTemplate, generateSelectorBaseTemplate, generateSelectorImplTemplate, generateUnitOfWorkTemplate } from '../templates/classTemplates';
+import { generateApplicationTemplate, generateServiceInterfaceTemplate, generateServiceBaseTemplate, generateServiceImplTemplate, generateDomainTemplate, generateDomainInterfaceTemplate, generateDomainBaseTemplate, generateDomainImplTemplate, generateSelectorTemplate, generateSelectorInterfaceTemplate, generateSelectorBaseTemplate, generateSelectorImplTemplate, generateUnitOfWorkTemplate } from '../templates/classTemplates';
 
 export class FFLibCommandHandler {
     constructor(
@@ -159,8 +159,8 @@ export class FFLibCommandHandler {
                 if (!value) {
                     return 'Class name is required';
                 }
-                if (!value.endsWith('Domain') && !value.endsWith('Domains')) {
-                    return 'Domain class name should end with "Domain" or "Domains"';
+                if (!value.endsWith('Domain') && !value.endsWith('Domains') && !value.startsWith('Domain')) {
+                    return 'Domain class name should start with "Domain" or end with "Domain" or "Domains"';
                 }
                 if (!/^[A-Z][a-zA-Z0-9]*$/.test(value)) {
                     return 'Class name should start with uppercase letter and contain only alphanumeric characters';
@@ -194,26 +194,24 @@ export class FFLibCommandHandler {
         // Register in Application if available
         if (item?.application) {
             await this.registerDomainInApplication(item.application.filePath, className, sObjectName);
-            vscode.window.showInformationMessage(`${className} registered in Application`);
+            vscode.window.showInformationMessage(`${className} created and registered in Application`);
+        } else {
+            vscode.window.showInformationMessage(`${className} created`);
         }
     }
 
     async createSelector(item?: any) {
         const applicationName = item?.application?.name?.replace('Application', '') || '';
-        const fullApplicationClassName = item?.application?.name || undefined;
         
         const className = await vscode.window.showInputBox({
-            prompt: `Enter the Selector base name${applicationName ? ` for ${applicationName}` : ''} (without 'I' or 'Impl')`,
+            prompt: `Enter the Selector class name${applicationName ? ` for ${applicationName}` : ''}`,
             placeHolder: applicationName ? `${applicationName}Selector` : 'AccountsSelector',
             validateInput: (value) => {
                 if (!value) {
                     return 'Class name is required';
                 }
-                if (!value.endsWith('Selector') && !value.endsWith('Selectors')) {
-                    return 'Selector class name should end with "Selector" or "Selectors"';
-                }
-                if (value.startsWith('I') || value.endsWith('Impl')) {
-                    return 'Enter the base name only (without I prefix or Impl suffix)';
+                if (!value.endsWith('Selector') && !value.endsWith('Selectors') && !value.startsWith('Selector')) {
+                    return 'Selector class name should start with "Selector" or end with "Selector" or "Selectors"';
                 }
                 if (!/^[A-Z][a-zA-Z0-9]*$/.test(value)) {
                     return 'Class name should start with uppercase letter and contain only alphanumeric characters';
@@ -242,88 +240,15 @@ export class FFLibCommandHandler {
             return;
         }
 
-        const classesDir = await this.fileScanner.findApexClassesDirectory();
+        await this.createClass(className, generateSelectorTemplate(className, sObjectName));
         
-        if (!classesDir) {
-            vscode.window.showErrorMessage('Could not find Apex classes directory');
-            return;
+        // Register in Application if available
+        if (item?.application) {
+            await this.registerSelectorInApplication(item.application.filePath, className, sObjectName);
+            vscode.window.showInformationMessage(`${className} created and registered in Application`);
+        } else {
+            vscode.window.showInformationMessage(`${className} created`);
         }
-
-        // Define the three class names
-        const interfaceName = `I${className}`;
-        const implName = `${className}Impl`;
-        
-        // Check if any already exist
-        const interfacePath = path.join(classesDir, `${interfaceName}.cls`);
-        const basePath = path.join(classesDir, `${className}.cls`);
-        const implPath = path.join(classesDir, `${implName}.cls`);
-        
-        if (fs.existsSync(interfacePath) || fs.existsSync(basePath) || fs.existsSync(implPath)) {
-            vscode.window.showErrorMessage(`One or more ${className} files already exist`);
-            return;
-        }
-
-        // Show loading message
-        await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: `Creating ${className} files...`,
-            cancellable: false
-        }, async (progress) => {
-            try {
-                // Create all three files
-                const createdFiles: string[] = [];
-                
-                progress.report({ message: 'Creating interface...' });
-                // 1. Create interface (IAccountsSelector)
-                await this.createClassFileOnly(interfaceName, generateSelectorInterfaceTemplate(interfaceName, sObjectName), classesDir);
-                createdFiles.push(interfaceName);
-                
-                progress.report({ message: 'Creating base class...' });
-                // 2. Create base class (AccountsSelector) - with application context
-                await this.createClassFileOnly(className, generateSelectorBaseTemplate(interfaceName, className, sObjectName, fullApplicationClassName), classesDir);
-                createdFiles.push(className);
-                
-                progress.report({ message: 'Creating implementation...' });
-                // 3. Create implementation (AccountsSelectorImpl)
-                await this.createClassFileOnly(implName, generateSelectorImplTemplate(interfaceName, implName, sObjectName), classesDir);
-                createdFiles.push(implName);
-                
-                progress.report({ message: 'Registering in Application...' });
-                // 4. Register in Application if available
-                if (item?.application) {
-                    await this.registerSelectorInApplication(item.application.filePath, implName, sObjectName);
-                }
-                
-                progress.report({ message: 'Refreshing tree view...' });
-                // Refresh tree view
-                this.fileScanner.clearCache();
-                this.treeDataProvider.refresh();
-                
-                // Show success message with options to open files
-                vscode.window.showInformationMessage(
-                    `Created Selector files: ${createdFiles.join(', ')}${item?.application ? ' and registered in Application' : ''}`,
-                    'Open Interface',
-                    'Open Base Class',
-                    'Open Implementation'
-                ).then(selection => {
-                    if (selection === 'Open Interface') {
-                        vscode.workspace.openTextDocument(interfacePath).then(doc => {
-                            vscode.window.showTextDocument(doc);
-                        });
-                    } else if (selection === 'Open Base Class') {
-                        vscode.workspace.openTextDocument(basePath).then(doc => {
-                            vscode.window.showTextDocument(doc);
-                        });
-                    } else if (selection === 'Open Implementation') {
-                        vscode.workspace.openTextDocument(implPath).then(doc => {
-                            vscode.window.showTextDocument(doc);
-                        });
-                    }
-                });
-            } catch (error) {
-                vscode.window.showErrorMessage(`Error creating selector files: ${error}`);
-            }
-        });
     }
 
     async createUnitOfWork(item?: any) {
@@ -333,7 +258,9 @@ export class FFLibCommandHandler {
         }
 
         const application = item.application;
-        const existingObjects = application.unitOfWorks || [];
+        
+        // Parse existing objects from the file directly (not from cache) to avoid stale comment data
+        const existingObjects = await this.getExistingUoWObjects(application.filePath);
 
         // Show progress while fetching SObjects
         await vscode.window.withProgress({
@@ -404,24 +331,17 @@ export class FFLibCommandHandler {
                     return;
                 }
                 
-                // Filter out already registered objects
-                const newObjects = selectedItems
-                    .map(item => item.label)
-                    .filter(obj => !existingObjects.includes(obj));
+                // Get selected object names
+                const selectedObjects = selectedItems.map(item => item.label);
                 
-                if (newObjects.length === 0) {
-                    vscode.window.showInformationMessage('All selected objects are already registered');
-                    return;
+                // Add objects to the Application file
+                const addedCount = await this.addSObjectsToUnitOfWork(application.filePath, selectedObjects);
+                
+                if (addedCount > 0) {
+                    // Refresh tree view
+                    this.fileScanner.clearCache();
+                    this.treeDataProvider.refresh();
                 }
-                
-                // Add new objects to the Application file
-                await this.addSObjectsToUnitOfWork(application.filePath, newObjects);
-                
-                vscode.window.showInformationMessage(`Added ${newObjects.length} SObject(s) to Unit of Work: ${newObjects.join(', ')}`);
-                
-                // Refresh tree view
-                this.fileScanner.clearCache();
-                this.treeDataProvider.refresh();
                 
             } catch (error) {
                 terminal.dispose();
@@ -430,58 +350,141 @@ export class FFLibCommandHandler {
         });
     }
 
-    private async addSObjectsToUnitOfWork(appFilePath: string, sObjectNames: string[]): Promise<void> {
+    /**
+     * Get existing UoW objects from Application file, ignoring comments
+     */
+    private async getExistingUoWObjects(appFilePath: string): Promise<string[]> {
+        try {
+            const document = await vscode.workspace.openTextDocument(appFilePath);
+            const text = document.getText();
+            
+            // Remove comments to avoid matching example code
+            const cleanedText = this.removeComments(text);
+            
+            // Find the UnitOfWorkFactory pattern
+            const uowPattern = /UnitOfWorkFactory\s*\(\s*new\s+List<SObjectType>\s*\{([^}]*)\}/s;
+            const match = cleanedText.match(uowPattern);
+            
+            if (!match || !match[1]) {
+                return [];
+            }
+            
+            const existingList = match[1];
+            const objects: string[] = [];
+            
+            // Extract SObject names
+            const objectMatches = existingList.matchAll(/(\w+)\.SObjectType/g);
+            for (const m of objectMatches) {
+                if (m[1]) {
+                    objects.push(m[1]);
+                }
+            }
+            
+            return objects;
+        } catch (error) {
+            console.error('Error reading UoW objects:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Remove comments from Apex code
+     */
+    private removeComments(content: string): string {
+        // Remove multi-line comments (/* ... */)
+        let cleaned = content.replace(/\/\*[\s\S]*?\*\//g, '');
+        
+        // Remove single-line comments (// ...)
+        cleaned = cleaned.replace(/\/\/.*$/gm, '');
+        
+        return cleaned;
+    }
+
+    private async addSObjectsToUnitOfWork(appFilePath: string, sObjectNames: string[]): Promise<number> {
         const document = await vscode.workspace.openTextDocument(appFilePath);
         const text = document.getText();
         
-        // Find the UnitOfWorkFactory pattern
+        // Remove comments to get accurate duplicate detection
+        const cleanedText = this.removeComments(text);
+        
+        // Find the UnitOfWorkFactory pattern in cleaned text for duplicate checking
         const uowPattern = /UnitOfWorkFactory\s*\(\s*new\s+List<SObjectType>\s*\{([^}]*)\}/s;
-        const match = text.match(uowPattern);
+        const match = cleanedText.match(uowPattern);
         
         if (!match) {
             vscode.window.showErrorMessage('Could not find UnitOfWorkFactory in Application file');
-            return;
+            return 0;
         }
         
         const existingList = match[1];
         
-        // Build new entries inline with commas
-        const newEntries = sObjectNames.map(obj => `${obj}.SObjectType`).join(', ');
-        
-        // Determine if we need a comma before adding
-        const trimmedExisting = existingList.trim();
-        const needsComma = trimmedExisting.length > 0 && !trimmedExisting.endsWith(',');
-        
-        // Build the new list - add inline with comma separator
-        let newList = existingList;
-        if (trimmedExisting.length > 0) {
-            // Add comma if needed, then space, then new entries
-            newList = existingList.trimEnd();
-            if (needsComma) {
-                newList += ', ';
-            } else {
-                newList += ' ';
-            }
-            newList += newEntries;
-            // Preserve any trailing whitespace structure
-            const trailingWhitespace = existingList.match(/(\s*)$/)?.[1] || '';
-            newList += trailingWhitespace;
-        } else {
-            // Empty list, just add the entries
-            newList = ' ' + newEntries + ' ';
+        // Parse existing SObjects to avoid duplicates
+        const existingSObjects = new Set<string>();
+        const existingMatches = existingList.matchAll(/(\w+)\.SObjectType/g);
+        for (const m of existingMatches) {
+            existingSObjects.add(m[1]);
         }
         
-        // Replace in document
-        const newText = text.replace(uowPattern, `UnitOfWorkFactory(\n                new List<SObjectType> {${newList}}`);
+        // Filter out duplicates
+        const newObjects = sObjectNames.filter(obj => !existingSObjects.has(obj));
+        
+        if (newObjects.length === 0) {
+            vscode.window.showInformationMessage('All selected objects are already registered');
+            return 0;
+        }
+        
+        // Now find the pattern in the ORIGINAL text for replacement
+        const originalMatch = text.match(uowPattern);
+        if (!originalMatch) {
+            vscode.window.showErrorMessage('Could not locate UnitOfWorkFactory in document');
+            return 0;
+        }
+        
+        const fullMatch = originalMatch[0];
+        const originalExistingList = originalMatch[1];
+        
+        // Build new list
+        let newList = originalExistingList.trim();
+        
+        // Add new entries
+        for (const obj of newObjects) {
+            if (newList.length > 0 && !newList.endsWith(',')) {
+                newList += ',';
+            }
+            if (newList.length > 0) {
+                newList += '\n                ';
+            }
+            newList += `${obj}.SObjectType`;
+        }
+        
+        // Build the replacement text with proper formatting
+        const replacement = `UnitOfWorkFactory(\n            new List<SObjectType> {\n                ${newList}\n            }`;
+        
+        // Find the position of the match in the document
+        const matchIndex = text.indexOf(fullMatch);
+        if (matchIndex === -1) {
+            vscode.window.showErrorMessage('Could not locate UnitOfWorkFactory in document');
+            return 0;
+        }
+        
+        const startPos = document.positionAt(matchIndex);
+        const endPos = document.positionAt(matchIndex + fullMatch.length);
         
         // Apply edit
         const edit = new vscode.WorkspaceEdit();
-        edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0), newText);
-        await vscode.workspace.applyEdit(edit);
-        await document.save();
+        edit.replace(document.uri, new vscode.Range(startPos, endPos), replacement);
+        const success = await vscode.workspace.applyEdit(edit);
         
-        // Open the file to show changes
-        await vscode.window.showTextDocument(document);
+        if (success) {
+            await document.save();
+            // Open the file to show changes
+            await vscode.window.showTextDocument(document);
+            vscode.window.showInformationMessage(`Added ${newObjects.length} SObject(s) to Unit of Work: ${newObjects.join(', ')}`);
+            return newObjects.length;
+        } else {
+            vscode.window.showErrorMessage('Failed to update Application file');
+            return 0;
+        }
     }
 
     private async createClass(className: string, content: string) {

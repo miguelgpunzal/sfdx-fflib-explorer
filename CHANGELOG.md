@@ -2,6 +2,63 @@
 
 All notable changes to the "Salesforce FFLIB Explorer" extension will be documented in this file.
 
+## [1.0.8] - 2024-10-24
+### Changed
+- **CORRECTED FFLIB Structure**: Now follows proper FFLIB pattern
+  - **Services**: 3 files (Interface + Base + Implementation)
+    - `IAccountService` - Interface
+    - `AccountService` - Abstract base class with factory methods
+    - `AccountServiceImpl` - Concrete implementation
+  - **Selectors**: 1 file (Just Base class)
+    - `AccountsSelector` - Extends `fflib_SObjectSelector`
+  - **Domains**: 1 file (Just Base class)  
+    - `AccountsDomain` - Extends `fflib_SObjectDomain` with inner Constructor class
+
+### Added
+- Allow "Selector" as prefix in selector names (e.g., `SelectorBank`, `SelectorAccount`)
+- Allow "Domain" as prefix in domain names (e.g., `DomainBank`, `DomainAccount`)
+
+## [1.0.7] - 2024-10-24
+### Changed
+- **Selector creation**: Now creates 2 files (Interface + Implementation) instead of 3
+  - `IAccountsSelector` (interface)
+  - `AccountsSelector` (implementation, extends fflib_SObjectSelector)
+- **Domain creation**: Still creates 1 file (just implementation with inner Constructor class)
+  - `AccountsDomain` (extends fflib_SObjectDomain)
+
+### Added
+- Allow "Selector" as prefix in selector names (e.g., `SelectorBank`, `SelectorAccount`)
+- Allow "Domain" as prefix in domain names (e.g., `DomainBank`, `DomainAccount`)
+
+### Fixed
+- Input validation now accepts both prefix and suffix patterns for Selectors and Domains
+
+## [1.0.6] - 2024-10-24
+### Fixed
+- Fixed Unit of Work registration reading comments from Application file
+- UoW registration now parses the Application file directly (not from cache) to avoid stale data
+- Added `removeComments()` helper in commandHandler to ensure comments are stripped before checking existing UoW objects
+- Fixed issue where fresh Application classes with example comments showed "already registered" message
+
+## [1.0.5] - 2024-10-24
+### Fixed
+- Fixed Unit of Work registration not updating Application file when SObjects are selected
+- Improved document edit logic to use position-based replacement instead of full document replacement
+
+### Added
+- Domain classes can now have "Domain" as prefix (e.g., `DomainAccount`) or suffix (e.g., `AccountDomain`)
+- Better support for different domain naming conventions
+
+## [1.0.4] - 2024-10-24
+### Fixed
+- Fixed issue where comments in Application files were being parsed as actual registrations
+- Extension now properly ignores example code in comments (e.g., `// Example: IBankService.class => BankServiceImpl.class`)
+- Added comment removal preprocessing before parsing Application factories
+
+## [1.0.3] - 2024-10-24
+### Changed
+- Updated extension icon
+
 ## [1.0.2] - 2024-01-XX
 ### Added
 - Interactive ASCII tree view simulation in README

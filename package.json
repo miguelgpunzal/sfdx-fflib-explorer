@@ -2,7 +2,7 @@
   "name": "salesforce-fflib-explorer",
   "displayName": "Salesforce FFLIB Explorer",
   "description": "Visual interface for managing FFLIB architecture in Salesforce projects",
-  "version": "1.0.2",
+  "version": "1.0.8",
   "publisher": "MiguelPunzal",
   "icon": "icon.png",
   "repository": {

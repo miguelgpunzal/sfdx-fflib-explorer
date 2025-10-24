@@ -435,10 +435,13 @@ export class FFLibFileScanner {
         const objects: string[] = [];
         
         try {
+            // Remove comments to avoid matching example code in comments
+            const cleanedContent = this.removeComments(fileContent);
+            
             // Look for UnitOfWorkFactory pattern
             // Example: new List<SObjectType> { Account.SObjectType, Contact.SObjectType }
             const uowPattern = /UnitOfWorkFactory\s*\(\s*new\s+List<SObjectType>\s*\{([^}]+)\}/s;
-            const match = fileContent.match(uowPattern);
+            const match = cleanedContent.match(uowPattern);
             
             if (match && match[1]) {
                 const objectsString = match[1];
@@ -466,10 +469,13 @@ export class FFLibFileScanner {
         const services: string[] = [];
         
         try {
+            // Remove comments to avoid matching example code in comments
+            const cleanedContent = this.removeComments(fileContent);
+            
             // Look for ServiceFactory pattern
             // Example: new fflib_Application.ServiceFactory( new Map<Type, Type> { IService.class => ServiceImpl.class })
             const servicePattern = /ServiceFactory\s*\(\s*new\s+Map<Type,\s*Type>\s*\{([^}]+)\}/s;
-            const match = fileContent.match(servicePattern);
+            const match = cleanedContent.match(servicePattern);
             
             if (match && match[1]) {
                 const mappingsString = match[1];
@@ -500,10 +506,13 @@ export class FFLibFileScanner {
         const domains: string[] = [];
         
         try {
+            // Remove comments to avoid matching example code in comments
+            const cleanedContent = this.removeComments(fileContent);
+            
             // Look for DomainFactory pattern
             // Example: new fflib_Application.DomainFactory( ... new Map<SObjectType, Type> { Account.SObjectType => AccountsDomain.class })
             const domainPattern = /DomainFactory\s*\([^)]*new\s+Map<\w+,\s*Type>\s*\{([^}]+)\}/s;
-            const match = fileContent.match(domainPattern);
+            const match = cleanedContent.match(domainPattern);
             
             if (match && match[1]) {
                 const mappingsString = match[1];
@@ -533,10 +542,13 @@ export class FFLibFileScanner {
         const selectors: string[] = [];
         
         try {
+            // Remove comments to avoid matching example code in comments
+            const cleanedContent = this.removeComments(fileContent);
+            
             // Look for SelectorFactory pattern
             // Example: new fflib_Application.SelectorFactory( new Map<SObjectType, Type> { Account.SObjectType => AccountsSelector.class })
             const selectorPattern = /SelectorFactory\s*\(\s*new\s+Map<\w+,\s*Type>\s*\{([^}]+)\}/s;
-            const match = fileContent.match(selectorPattern);
+            const match = cleanedContent.match(selectorPattern);
             
             if (match && match[1]) {
                 const mappingsString = match[1];
@@ -555,6 +567,19 @@ export class FFLibFileScanner {
         }
         
         return selectors;
+    }
+
+    /**
+     * Remove single-line and multi-line comments from Apex code
+     */
+    private removeComments(content: string): string {
+        // Remove multi-line comments (/* ... */)
+        let cleaned = content.replace(/\/\*[\s\S]*?\*\//g, '');
+        
+        // Remove single-line comments (// ...)
+        cleaned = cleaned.replace(/\/\/.*$/gm, '');
+        
+        return cleaned;
     }
 
     private async readFile(filePath: string): Promise<string> {
@@ -608,9 +633,11 @@ export class FFLibFileScanner {
             return FFLibLayerType.SERVICE;
         }
 
-        // Domain classes
+        // Domain classes - can have Domain as prefix OR suffix
         if (fileName.endsWith('Domain') || 
             fileName.endsWith('Domains') ||
+            fileName.startsWith('Domain') ||
+            fileName.startsWith('Domains') ||
             fileName.startsWith('I') && (fileName.includes('Domain') || fileName.includes('Domains')) ||
             fileContent.includes('extends fflib_SObjects') ||
             fileContent.includes('extends fflib_SObjectDomain')) {
