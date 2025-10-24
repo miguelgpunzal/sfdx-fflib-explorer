@@ -2,12 +2,12 @@
   "name": "salesforce-fflib-explorer",
   "displayName": "Salesforce FFLIB Explorer",
   "description": "Visual interface for managing FFLIB architecture in Salesforce projects",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "publisher": "MiguelPunzal",
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/miguelpunzal/sfdx-fflib-ui-configurator"
+    "url": "https://github.com/miguelgpunzal/sfdx-fflib-explorer"
   },
   "engines": {
     "vscode": "^1.80.0"

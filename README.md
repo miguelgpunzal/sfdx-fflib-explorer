@@ -1,209 +1,346 @@
-# Salesforce FFLIB UI Configuration
+# Salesforce FFLIB Explorer
 
-A Visual Studio Code extension that provides a user-friendly interface for managing and navigating FFLIB (FinancialForce Apex Library) architecture in Salesforce projects.
+<div align="center">
 
-## Features
+![FFLIB Explorer Icon](icon.png)
 
-### 📊 Visual Architecture Explorer
-- **Tree View Interface**: Browse your FFLIB architecture layers in a clean, hierarchical view
-- **Application-Centric Organization**: See all your Applications and their associated layers
-- **Layer Categories**: Organized display of Services, Domains, Selectors, and Unit of Work classes
+**A powerful Visual Studio Code extension for managing FFLIB architecture in Salesforce projects**
 
-### 🎯 Quick Navigation
-- **One-Click File Opening**: Click any class to open it in the editor
-- **Hierarchical Structure**: Easily understand the relationship between applications and their components
-- **Visual Icons**: Distinct icons for each layer type for quick identification
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/MiguelPunzal.salesforce-fflib-explorer)](https://marketplace.visualstudio.com/items?itemName=MiguelPunzal.salesforce-fflib-explorer)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/MiguelPunzal.salesforce-fflib-explorer)](https://marketplace.visualstudio.com/items?itemName=MiguelPunzal.salesforce-fflib-explorer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### ⚡ Fast Class Creation
-- **Create New Application**: Scaffold a new FFLIB Application class with proper structure
-- **Create New Service**: Generate Service interface and implementation with FFLIB patterns
-- **Create New Domain**: Create Domain classes with trigger handlers and business logic templates
-- **Create New Selector**: Generate Selector classes with SOQL query methods
-- **Create New Unit of Work**: Build Unit of Work classes for transaction management
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](docs/USAGE.md)
 
-### 🏗️ FFLIB Architecture Compliance
-All generated classes follow FFLIB best practices:
-- **Applications**: Dependency injection and factory configuration
-- **Services**: Multi-object orchestration and business processes
-- **Domains**: Single-object business logic and validation
-- **Selectors**: SOQL query handlers with FLS enforcement
-- **Unit of Work**: DML operations and transaction control
-
-## Requirements
-
-- Visual Studio Code 1.80.0 or higher
-- A Salesforce project with `sfdx-project.json` file
-- FFLIB libraries installed in your Salesforce project
-
-## Installation
-
-1. Open VS Code
-2. Go to Extensions (Ctrl+Shift+X / Cmd+Shift+X)
-3. Search for "Salesforce FFLIB UI Configuration"
-4. Click Install
-
-Or install from VSIX:
-```bash
-code --install-extension salesforce-fflib-ui-configurator-1.0.0.vsix
-```
-
-## Usage
-
-### Opening the FFLIB Explorer
-
-The extension **automatically activates** when you open a Salesforce project (detects `sfdx-project.json`).
-
-**To open the UI:**
-
-1. **Option 1 (Recommended)**: Click the **FFLIB Explorer icon** in the Activity Bar (left sidebar)
-   - Look for the 📦 grid icon labeled "FFLIB EXPLORER"
-   
-2. **Option 2**: Use Command Palette
-   - Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
-   - Type: "FFLIB: Refresh"
-   - Press Enter
-
-The extension will **automatically scan** your project directories:
-- `force-app/main/default/classes/` (SFDX)
-- `src/classes/` (Metadata API)
-- `classes/` (Legacy)
-
-All FFLIB components are detected and organized by:
-- Naming conventions (`*Application`, `*Service`, `*Domain`, `*Selector`, `*UnitOfWork`)
-- Class content (detecting `extends fflib_Application`, etc.)
-- Relationship to parent applications
-
-### Creating a New Application
-
-1. In the FFLIB Explorer, click **"Applications"**
-2. Click the **"$(add) Create New Application"** button
-3. Enter the application name (e.g., `OnboardingApplication`)
-4. The extension creates the Application class with proper FFLIB structure
-
-### Creating Services, Domains, Selectors, or UOW
-
-1. Expand an Application in the tree view
-2. Expand the layer you want to add to (Services, Domains, Selectors, or Unit of Work)
-3. Click the **"$(add) Create New..."** button for that layer
-4. Follow the prompts to provide:
-   - Class name
-   - SObject name (for Domains and Selectors)
-5. The extension creates the class with appropriate templates and meta.xml file
-
-### Navigating Classes
-
-- Simply click on any class name in the tree view to open it in the editor
-- Classes are automatically organized under their parent application
-
-## Extension Settings
-
-This extension contributes the following commands:
-
-* `fflib.refresh`: Refresh the FFLIB Explorer view
-* `fflib.createApplication`: Create a new Application class
-* `fflib.createService`: Create a new Service class
-* `fflib.createDomain`: Create a new Domain class
-* `fflib.createSelector`: Create a new Selector class
-* `fflib.createUnitOfWork`: Create a new Unit of Work class
-
-## FFLIB Architecture Overview
-
-This extension follows the FFLIB framework architecture:
-
-### Layer Responsibilities
-
-1. **Application Layer**
-   - Entry point for dependency injection
-   - Factory configuration for Services, Domains, Selectors, and UOW
-   - Wiring up implementations
-
-2. **Service Layer**
-   - Multi-object orchestration
-   - Complex business processes
-   - Transaction control via Unit of Work
-   - No direct SOQL (use Selectors)
-   - No direct DML (use Unit of Work)
-
-3. **Domain Layer**
-   - Single-object business logic
-   - Validation rules
-   - Field defaulting
-   - Record-level calculations
-   - Trigger handlers
-   - No cross-object operations
-
-4. **Selector Layer**
-   - All SOQL queries for specific SObjects
-   - Query construction and optimization
-   - Field Level Security (FLS) enforcement
-   - No business logic
-
-5. **Unit of Work Layer**
-   - DML operations (insert, update, delete, undelete)
-   - Transaction management
-   - Maintain relationship integrity
-   - Proper operation order
-   - No business logic
-
-## Project Structure Detection
-
-The extension automatically detects Salesforce project structures:
-
-- `force-app/main/default/classes/` (SFDX format)
-- `src/classes/` (Metadata API format)
-- `classes/` (Legacy format)
-
-## Class Naming Conventions
-
-The extension enforces FFLIB naming conventions:
-
-- **Applications**: Must end with `Application` (e.g., `OnboardingApplication`)
-- **Services**: Must end with `Service` or `ServiceImpl`
-- **Domains**: Must end with `Domain` or `Domains`
-- **Selectors**: Can start or end with `Selector` or `Selectors` (e.g., `AccountSelector`, `AccountsSelector`, `SelectorAccount`, `SelectorsAccount`)
-- **Unit of Work**: Must contain `UnitOfWork`
-
-## Generated Class Templates
-
-All generated classes include:
-- Comprehensive documentation comments
-- FFLIB framework inheritance
-- Example methods and patterns
-- Best practice comments
-- Proper Salesforce metadata (cls-meta.xml)
-
-## Known Issues
-
-- The extension requires FFLIB libraries to be installed in your Salesforce project
-- Class detection is based on naming conventions and file content analysis
-- Orphaned classes (not associated with an application) are currently collected but not displayed
-
-## Release Notes
-
-### 1.0.0
-
-Initial release of Salesforce FFLIB UI Configuration
-
-- Tree view explorer for FFLIB architecture
-- Application, Service, Domain, Selector, and UOW class creation
-- Automatic workspace scanning and organization
-- One-click navigation to class files
-- FFLIB-compliant templates for all layers
-
-## Contributing
-
-Found a bug or have a feature request? Please open an issue on our GitHub repository.
-
-## Resources
-
-- [FFLIB Framework Documentation](https://docs.goharrier.com/technical/frameworks/fflib-apex-framework)
-- [FFLIB GitHub Repository](https://github.com/apex-enterprise-patterns/fflib-apex-common)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-
-## License
-
-MIT License - See LICENSE file for details
+</div>
 
 ---
 
-**Enjoy building scalable Salesforce applications with FFLIB!** 🚀
+## 🎯 What is FFLIB Explorer?
+
+FFLIB Explorer transforms how you work with the **FinancialForce Apex Library (FFLIB)** framework in Salesforce. It provides an intuitive visual interface to navigate, create, and manage your FFLIB architecture layers directly from VS Code.
+
+### Interactive Tree View Preview
+
+<details open>
+<summary>Click to expand/collapse the tree view simulation</summary>
+
+```
+FFLIB EXPLORER
+│
+└─ 📦 Applications (2)
+   │
+   ├─ 🔷 BankApplication
+   │  ├─ 🔧 Services (2)
+   │  │  ├─ ➕ Create New Service
+   │  │  ├─ 📄 IAccountTransferService
+   │  │  │  ├─ 📄 IAccountTransferService (interface)
+   │  │  │  └─ 📄 AccountTransferServiceImpl (implementation)
+   │  │  └─ 📄 IPaymentProcessingService
+   │  │     ├─ 📄 IPaymentProcessingService (interface)
+   │  │     └─ 📄 PaymentProcessingServiceImpl (implementation)
+   │  │
+   │  ├─ 🏗️ Domains (1)
+   │  │  ├─ ➕ Create New Domain
+   │  │  └─ 📄 AccountsDomain
+   │  │
+   │  ├─ 🔍 Selectors (2)
+   │  │  ├─ ➕ Create New Selector
+   │  │  ├─ 📄 IAccountsSelector
+   │  │  │  ├─ 📄 IAccountsSelector (interface)
+   │  │  │  └─ 📄 AccountsSelectorImpl (implementation)
+   │  │  └─ 📄 ITransactionsSelector
+   │  │     ├─ 📄 ITransactionsSelector (interface)
+   │  │     └─ 📄 TransactionsSelectorImpl (implementation)
+   │  │
+   │  └─ 💾 Unit of Work
+   │     ├─ ➕ Register SObjects
+   │     └─ 📋 Registered SObjects:
+   │        ├─ Account
+   │        ├─ Transaction__c
+   │        └─ Payment__c
+   │
+   └─ 🔷 LoanApplication
+      ├─ 🔧 Services (1)
+      │  ├─ ➕ Create New Service
+      │  └─ 📄 ILoanApprovalService
+      │     ├─ 📄 ILoanApprovalService (interface)
+      │     └─ 📄 LoanApprovalServiceImpl (implementation)
+      │
+      ├─ 🏗️ Domains (2)
+      │  ├─ ➕ Create New Domain
+      │  ├─ 📄 LoansDomain
+      │  └─ 📄 ApplicantsDomain
+      │
+      ├─ 🔍 Selectors (1)
+      │  ├─ ➕ Create New Selector
+      │  └─ 📄 ILoansSelector
+      │     ├─ 📄 ILoansSelector (interface)
+      │     └─ 📄 LoansSelectorImpl (implementation)
+      │
+      └─ 💾 Unit of Work
+         ├─ ➕ Register SObjects
+         └─ 📋 Registered SObjects:
+            ├─ Loan__c
+            └─ Applicant__c
+```
+
+**🎬 Actions available:**
+- Click any class name → Opens in editor
+- Click ➕ buttons → Creates new class with templates
+- Click Application → Auto-expands layers
+- Right-click missing class → Retrieve from org
+
+</details>
+
+---
+
+## ✨ Features
+
+---
+
+## ✨ Features
+
+### 🎨 **Smart Auto-Creation**
+When you create a **Service** or **Selector**, the extension automatically generates:
+- ✅ **Interface** (e.g., `IAccountTransferService`)
+- ✅ **Base Class** (e.g., `AccountTransferService`) with factory methods
+- ✅ **Implementation** (e.g., `AccountTransferServiceImpl`)
+- ✅ **Auto-Registration** in Application's factory
+- ✅ **Proper Application Context** (e.g., `BankApplication.Service.newInstance()`)
+
+### 📊 **Visual Architecture Explorer**
+### 📊 **Visual Architecture Explorer**
+- **Tree View Interface**: Browse FFLIB layers in a clean, hierarchical view
+- **Application-Centric**: See all Applications and their layers at a glance
+- **Layer Categories**: Services, Domains, Selectors, and Unit of Work
+- **Missing Class Detection**: Warnings for registered but missing classes
+- **One-Click Retrieval**: Download missing classes from org
+
+### 🚀 **Performance Optimized**
+- **Multi-Level Caching**: Lightning-fast navigation
+- **Lazy Loading**: Only loads data when needed
+- **Smart Scanning**: Efficient workspace analysis
+
+### ⚡ **Quick Class Creation**
+- **📱 Create Application**: Scaffold complete FFLIB Application
+- **🔧 Create Service**: Interface + Base + Implementation (3 files)
+- **🏗️ Create Domain**: Domain class with trigger handlers
+- **🔍 Create Selector**: Interface + Base + Implementation (3 files)
+- **💾 Create Unit of Work**: Multi-select SObject registration
+
+### � **Developer Experience**
+- **Loading Indicators**: Visual feedback during operations
+- **Smart Placeholders**: Generic examples (BankApplication, AccountTransferService)
+- **Quick Open**: Open Interface, Base, or Implementation after creation
+- **Auto-Refresh**: Tree updates automatically after file changes
+
+---
+
+## 🚀 Installation
+
+### From VS Code Marketplace
+
+1. Open VS Code
+2. Press `Ctrl+Shift+X` (Windows/Linux) or `Cmd+Shift+X` (Mac)
+3. Search for **"Salesforce FFLIB Explorer"**
+4. Click **Install**
+
+### From Command Line
+
+```bash
+code --install-extension MiguelPunzal.salesforce-fflib-explorer
+```
+
+---
+
+## 📖 Usage
+
+### 1️⃣ **Opening FFLIB Explorer**
+
+The extension activates automatically when you open a Salesforce project.
+
+**Access the tree view:**
+- Click the **📦 FFLIB Explorer** icon in the Activity Bar (left sidebar)
+- Or use Command Palette: `Ctrl+Shift+P` → "FFLIB: Refresh"
+
+### 2️⃣ **Creating a New Service**
+
+```
+1. Expand your Application (e.g., BankApplication)
+2. Expand "Services"
+3. Click "➕ Create New Service"
+4. Enter name: "AccountTransferService"
+5. ✅ Creates 3 files:
+   - IAccountTransferService.cls (interface)
+   - AccountTransferService.cls (base with factory method)
+   - AccountTransferServiceImpl.cls (implementation)
+6. ✅ Automatically registers in BankApplication
+```
+
+**Generated factory method:**
+```apex
+private static IAccountTransferService service() {
+    return (IAccountTransferService) BankApplication.Service
+        .newInstance(IAccountTransferService.class);
+}
+```
+
+### 3️⃣ **Creating a New Selector**
+
+```
+1. Expand your Application
+2. Expand "Selectors"  
+3. Click "➕ Create New Selector"
+4. Enter name: "AccountsSelector"
+5. Enter SObject: "Account"
+6. ✅ Creates 3 files + Auto-registers
+```
+
+### 4️⃣ **Creating a New Domain**
+
+```
+1. Expand your Application
+2. Expand "Domains"
+3. Click "➕ Create New Domain"
+4. Enter name: "AccountsDomain"
+5. Enter SObject: "Account"
+6. ✅ Creates domain with trigger handlers
+```
+
+### 5️⃣ **Registering Unit of Work SObjects**
+
+```
+1. Expand your Application
+2. Click "Unit of Work"
+3. Click "➕ Register SObjects"
+4. Multi-select SObjects from org:
+   ☑ Account
+   ☑ Contact
+   ☑ Opportunity
+5. ✅ Auto-registered in proper DML order
+```
+
+---
+
+## 🏗️ FFLIB Architecture
+
+This extension follows the **FFLIB Enterprise Patterns** framework:
+
+| Layer | Purpose | Responsibilities |
+|-------|---------|------------------|
+| **Application** | Dependency Injection | Factory configuration, wiring implementations |
+| **Service** | Multi-Object Logic | Orchestration, complex processes, transactions |
+| **Domain** | Single-Object Logic | Validation, business rules, trigger handlers |
+| **Selector** | Data Access | SOQL queries, FLS enforcement, query optimization |
+| **Unit of Work** | Data Persistence | DML operations, transaction management, relationships |
+
+### 📐 **Design Principles**
+
+✅ **Separation of Concerns**: Each layer has distinct responsibilities  
+✅ **Testability**: Interface-based design enables mocking  
+✅ **Maintainability**: Consistent patterns across codebase  
+✅ **Scalability**: Organized structure for enterprise applications  
+
+---
+
+## 📁 Project Structure Detection
+
+The extension automatically detects these Salesforce project structures:
+
+```
+✅ force-app/main/default/classes/  (SFDX)
+✅ src/classes/                     (Metadata API)
+✅ classes/                         (Legacy)
+```
+
+---
+
+## 🎨 Class Naming Conventions
+
+| Layer | Convention | Examples |
+|-------|-----------|----------|
+| **Application** | `*Application` | `BankApplication`, `LoanApplication` |
+| **Service** | `*Service`, `*ServiceImpl` | `AccountTransferService`, `PaymentProcessingServiceImpl` |
+| **Domain** | `*Domain`, `*Domains` | `AccountsDomain`, `LoanDomain` |
+| **Selector** | `*Selector`, `*Selectors` | `AccountsSelector`, `LoanSelector` |
+| **Unit of Work** | `*UnitOfWork` | `BankUnitOfWork` |
+
+---
+
+## 🛠️ Extension Commands
+
+| Command | Description |
+|---------|-------------|
+| `fflib.refresh` | Refresh FFLIB Explorer view |
+| `fflib.createApplication` | Create new Application class |
+| `fflib.createService` | Create Service (Interface + Base + Impl) |
+| `fflib.createDomain` | Create Domain class |
+| `fflib.createSelector` | Create Selector (Interface + Base + Impl) |
+| `fflib.createUnitOfWork` | Register SObjects in Unit of Work |
+| `fflib.openFile` | Open class file in editor |
+| `fflib.retrieveClass` | Retrieve missing class from org |
+
+---
+
+## 📚 Resources
+
+- 📖 [FFLIB Framework Documentation](https://docs.goharrier.com/technical/frameworks/fflib-apex-framework)
+- 💻 [FFLIB GitHub Repository](https://github.com/apex-enterprise-patterns/fflib-apex-common)
+- 🎓 [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
+- 📘 [Extension Documentation](docs/USAGE.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 Changelog
+
+### 1.0.1 (Latest)
+- ✅ Fixed repository URL
+- ✅ Updated documentation
+
+### 1.0.0
+- ✅ Initial release
+- ✅ Tree view explorer for FFLIB architecture
+- ✅ Auto-creation with Interface + Base + Implementation
+- ✅ Auto-registration in Application factories
+- ✅ Multi-select SObject picker for Unit of Work
+- ✅ Performance optimization with multi-level caching
+- ✅ Missing class detection and retrieval
+- ✅ Loading progress indicators
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE.txt) file for details
+
+---
+
+## ⭐ Show Your Support
+
+If you find this extension helpful, please:
+- ⭐ Star the [GitHub repository](https://github.com/miguelgpunzal/sfdx-fflib-explorer)
+- 📝 Leave a review on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=MiguelPunzal.salesforce-fflib-explorer)
+- 🐛 Report issues or suggest features
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the Salesforce Community**
+
+[Report Bug](https://github.com/miguelgpunzal/sfdx-fflib-explorer/issues) • [Request Feature](https://github.com/miguelgpunzal/sfdx-fflib-explorer/issues) • [Documentation](docs/USAGE.md)
+
+</div>
